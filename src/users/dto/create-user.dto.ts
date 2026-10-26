@@ -1,5 +1,4 @@
-import { IsString, IsOptional, IsEnum } from 'class-validator';
-import { UserRole } from '../entities/user.entity';
+import { IsString, IsOptional } from 'class-validator';
 
 export class CreateUserDto {
   @IsString()
@@ -16,11 +15,8 @@ export class CreateUserDto {
 
   @IsString()
   address!: string;
-  
+
   @IsOptional()
   @IsString()
   profilePicture?: string;
-  
-  @IsEnum(UserRole)
-  role!:UserRole;
 }

@@ -1,10 +1,16 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
-import { Product } from "../../products/entities/product.entity";
-import { User } from "../../users/entities/user.entity";
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { Product } from '../../products/entities/product.entity';
+import { User } from '../../users/entities/user.entity';
 
 @Entity('shopping_cart_items')
 export class ShoppingCartItem {
-
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 

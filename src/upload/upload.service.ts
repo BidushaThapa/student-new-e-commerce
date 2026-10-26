@@ -88,7 +88,7 @@ export class UploadService {
         height: cloudinaryResult.height,
       });
       return await this.uploadRepository.save(upload);
-    } catch (error) {
+    } catch {
       throw new InternalServerErrorException(
         'Failed to save upload to database',
       );

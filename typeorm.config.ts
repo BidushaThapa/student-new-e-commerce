@@ -7,7 +7,7 @@
 //we cannot ues that file in typeorm migration CLI
 
 //code
-import config from 'config/config';
+import config from './src/config/config';
 import * as dotenv from 'dotenv';
 dotenv.config();
 import {DataSource} from 'typeorm';

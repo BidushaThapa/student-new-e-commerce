@@ -7,7 +7,6 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
-  JoinColumn,
   ManyToOne,
 } from 'typeorm';
 import { OrderItem } from './order-item.entity';
@@ -24,7 +23,8 @@ export type PaymentMethod =
   | 'credit_card'
   | 'debit_card'
   | 'paypal'
-  | 'cash_on_delivery';
+  | 'cash_on_delivery'
+  | 'khalti';
 
 @Entity('orders')
 @Index(['userId'])
@@ -33,11 +33,11 @@ export class Order {
   id: string;
 
   @Column({ nullable: true })
-userId: string;
+  userId: string;
   @Column({ type: 'decimal', precision: 10, scale: 2 })
   totalAmount: number;
-@Column({ type: 'float', nullable: true, default: 0 })
-totalPrice: number;
+  @Column({ type: 'float', nullable: true, default: 0 })
+  totalPrice: number;
 
   @Column({
     type: 'enum',
@@ -51,7 +51,7 @@ totalPrice: number;
 
   @Column({
     type: 'enum',
-    enum: ['credit_card', 'debit_card', 'paypal', 'cash_on_delivery'],
+    enum: ['credit_card', 'debit_card', 'paypal', 'cash_on_delivery', 'khalti'],
   })
   paymentMethod: PaymentMethod;
 
@@ -65,9 +65,10 @@ totalPrice: number;
   updatedAt: Date;
   @ManyToOne(() => User, (user) => user.orders, { onDelete: 'CASCADE' })
   user: User;
-  @OneToMany(() => OrderItem, (orderItem) => orderItem.order)
+  @OneToMany(() => OrderItem, (orderItem) => orderItem.order, {
+    cascade: true,
+  })
   orderItems: OrderItem[];
   @OneToOne(() => Payment, (payment) => payment.order)
-payment: Payment;
-
+  payment: Payment;
 }

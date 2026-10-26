@@ -1,42 +1,56 @@
-import {Controller,Get,Post,Body,ParseIntPipe,Delete,Req,Res,Put,HttpStatus,Param,Query,ForbiddenException} from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  UseGuards,
+} from '@nestjs/common';
 import { ProductsService } from './products.service';
-import {CreateProductDto} from './dto/create-product.dto';
+import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-products.dto';
 import { Product } from './entities/product.entity';
+import { AuthGuard } from '../users/auth/auth.guard';
+import { RolesGuard } from '../users/auth/roles.guard';
+import { Roles } from '../users/decorators/roles.decorator';
+import { UserRole } from '../users/entities/user.entity';
 
 @Controller('products')
-export class ProductsController{
-constructor(
-   private readonly productService: ProductsService ){}
-@Post()
-addProduct( 
-    @Body() productBody: CreateProductDto){
+export class ProductsController {
+  constructor(private readonly productService: ProductsService) {}
+  @Post()
+  @Roles(UserRole.ADMIN)
+  @UseGuards(AuthGuard, RolesGuard)
+  addProduct(@Body() productBody: CreateProductDto) {
     return this.productService.addProduct(productBody);
-    }
-   @Put('/:id')
-   updateProduct(@Body() updateProductDto: UpdateProductDto,
-   @Param('id')id:string,){
-    return this.productService.updateProduct(id,updateProductDto);
-   }
-       @Get('/')
-    getAllProducts():Promise<Product[]>{
-        return this.productService.getAllProducts();
-    }
-    @Get('/:id')
-    getOneProduct(
-      @Param('id')id:string){
+  }
+  @Put('/:id')
+  @Roles(UserRole.ADMIN)
+  @UseGuards(AuthGuard, RolesGuard)
+  updateProduct(
+    @Body() updateProductDto: UpdateProductDto,
+    @Param('id') id: string,
+  ) {
+    return this.productService.updateProduct(id, updateProductDto);
+  }
+  @Get('/')
+  getAllProducts(): Promise<Product[]> {
+    return this.productService.getAllProducts();
+  }
+  @Get('/:id')
+  getOneProduct(@Param('id') id: string) {
     return this.productService.getOneProduct(id);
-
+  }
+  @Delete('/:id')
+  @Roles(UserRole.ADMIN)
+  @UseGuards(AuthGuard, RolesGuard)
+  DeleteOneProduct(@Param('id') id: string) {
+    return this.productService.deleteOneProduct(id);
+  }
 }
-@Delete('/:id')
-DeleteOneProduct(
-   @Param('id')id:string){
-      return this.productService.deleteOneProduct(id)
-   }
 
-
-}
-  
 //     @Post()//body lina laii
 // createProduct(
 //     @Req()req:express.Request,

@@ -1,4 +1,10 @@
-import { IsString,MinLength,IsBoolean,IsOptional,IsNumber} from 'class-validator';
+import {
+  IsString,
+  MinLength,
+  IsBoolean,
+  IsOptional,
+  IsNumber,
+} from 'class-validator';
 
 export class UpdateCategoryDto {
   @IsOptional()

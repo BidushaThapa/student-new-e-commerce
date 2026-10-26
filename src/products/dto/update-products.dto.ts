@@ -1,4 +1,4 @@
- //import { IsOptional, IsString, IsNumber, MinLength } from 'class-validator';
+//import { IsOptional, IsString, IsNumber, MinLength } from 'class-validator';
 import { CreateProductDto } from './create-product.dto';
 import { PartialType } from '@nestjs/mapped-types';
 //  export class UpdateProductDto {

@@ -1,7 +1,4 @@
-
 import {
-  IsNumber,
-  IsPositive,
   IsArray,
   ValidateNested,
   IsString,
@@ -10,7 +7,7 @@ import {
   IsIn,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { OrderItem } from './order-item.dto';
+import { OrderItemDto } from './order-item.dto';
 
 export class CreateOrderDto {
   // @IsNumber()
@@ -19,15 +16,20 @@ export class CreateOrderDto {
 
   @IsArray()
   @ValidateNested({ each: true })
-  @Type(() => OrderItem)
-  orderItems: OrderItem[];
+  @Type(() => OrderItemDto)
+  orderItems!: OrderItemDto[];
 
   @IsString()
   @IsNotEmpty()
   @MinLength(10)
-  shippingAddress: string;
+  shippingAddress!: string;
 
   @IsString()
-  @IsIn(['credit_card', 'debit_card', 'paypal', 'cash_on_delivery'])
-  paymentMethod: 'credit_card' | 'debit_card' | 'paypal' | 'cash_on_delivery';
+  @IsIn(['credit_card', 'debit_card', 'paypal', 'cash_on_delivery', 'khalti'])
+  paymentMethod!:
+    | 'credit_card'
+    | 'debit_card'
+    | 'paypal'
+    | 'cash_on_delivery'
+    | 'khalti';
 }

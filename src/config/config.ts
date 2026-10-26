@@ -1,20 +1,65 @@
+function requiredEnv(name: string): string {
+  const value = process.env[name];
+  if (!value) {
+    throw new Error(`Missing required environment variable: ${name}`);
+  }
+  return value;
+}
+
+function numberEnv(name: string, fallback: number): number {
+  const value = process.env[name];
+  if (!value) {
+    return fallback;
+  }
+  const parsed = Number(value);
+  if (!Number.isInteger(parsed) || parsed <= 0) {
+    throw new Error(`Environment variable ${name} must be a positive integer`);
+  }
+  return parsed;
+}
+
+export function validateEnvironment(
+  environment: Record<string, unknown>,
+): Record<string, unknown> {
+  for (const name of [
+    'DB_USERNAME',
+    'DB_PASSWORD',
+    'DB_DATABASE',
+    'JWT_SECRET',
+    'CLOUDINARY_CLOUD_NAME',
+    'CLOUDINARY_API_KEY',
+    'CLOUDINARY_API_SECRET',
+  ]) {
+    if (!environment[name]) {
+      throw new Error(`Missing required environment variable: ${name}`);
+    }
+  }
+  return environment;
+}
+
 export default () => ({
-  port: parseInt(process.env.PORT  as string) || 3000,
+  port: numberEnv('PORT', 3000),
   database: {
     dbType: process.env.DB_TYPE || 'postgres',
     host: process.env.DB_HOST || 'localhost',
-    port: parseInt(process.env.DB_PORT as string, ) || 2061,
-    username: process.env.DB_USERNAME || 'user',
-    password: process.env.DB_PASSWORD || 'password',
-    databaseName: process.env.DB_DATABASE || 'app_db',
+    port: numberEnv('DB_PORT', 5432),
+    username: requiredEnv('DB_USERNAME'),
+    password: requiredEnv('DB_PASSWORD'),
+    databaseName: requiredEnv('DB_DATABASE'),
   },
   cloudinary: {
-    cloudName: process.env.CLOUDINARY_CLOUD_NAME || 'cloud_name',
-    apiKey: process.env.CLOUDINARY_API_KEY || 'api_key',
-    apiSecret: process.env.CLOUDINARY_API_SECRET || 'api_secret'
+    cloudName: requiredEnv('CLOUDINARY_CLOUD_NAME'),
+    apiKey: requiredEnv('CLOUDINARY_API_KEY'),
+    apiSecret: requiredEnv('CLOUDINARY_API_SECRET'),
   },
   jwt: {
-    secret: process.env.JWT_SECRET || 'Secret',
+    secret: requiredEnv('JWT_SECRET'),
     expireIn: process.env.JWT_EXPIRES_IN || '1h',
+  },
+  khalti: {
+    secretKey: process.env.KHALTI_SECRET_KEY || '',
+    verifyUrl:
+      process.env.KHALTI_VERIFY_URL ||
+      'https://dev.khalti.com/api/v2/payment/verify/',
   },
 });

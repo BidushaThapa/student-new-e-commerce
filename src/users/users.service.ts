@@ -13,6 +13,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
+import { UserRole } from './entities/user.entity';
 @Injectable()
 export class UsersService {
   constructor(
@@ -21,44 +22,43 @@ export class UsersService {
     private readonly userRepository: Repository<User>,
   ) {}
 
-async create(createUserDto: CreateUserDto): Promise<Partial<User>> {
-  try {
-    // 1️⃣ Check if email already exists
-    const existingUser = await this.userRepository.findOne({
-      where: { email: createUserDto.email },
-    });
+  async create(createUserDto: CreateUserDto): Promise<Partial<User>> {
+    try {
+      // 1️⃣ Check if email already exists
+      const existingUser = await this.userRepository.findOne({
+        where: { email: createUserDto.email },
+      });
 
-    if (existingUser) {
-      throw new ConflictException('Email already registered');
+      if (existingUser) {
+        throw new ConflictException('Email already registered');
+      }
+
+      // 2️⃣ Hash password
+      const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
+
+      const user = this.userRepository.create({
+        ...createUserDto,
+        password: hashedPassword,
+        role: UserRole.USER,
+      });
+
+      const savedUser = await this.userRepository.save(user);
+
+      // 3️⃣ Remove password from response
+      const { password: _password, ...result } = savedUser;
+      void _password;
+      return result;
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      console.log(error);
+      throw new InternalServerErrorException('Error creating user');
     }
-
-    // 2️⃣ Hash password
-    const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
-
-    const user = this.userRepository.create({
-      ...createUserDto,
-      password: hashedPassword,
-    });
-
-    const savedUser = await this.userRepository.save(user);
-
-    // 3️⃣ Remove password from response
-    const { password, ...result } = savedUser;
-
-    return result;
-
-  } catch (error) {
-    if (error instanceof HttpException) {
-      throw error;
-    }
-    console.log(error);
-    throw new InternalServerErrorException('Error creating user');
   }
-}
 
   //  Find All Users
   async findAll(): Promise<User[]> {
-
     return this.userRepository.find();
   }
 
@@ -81,7 +81,7 @@ async create(createUserDto: CreateUserDto): Promise<Partial<User>> {
 
     try {
       return await this.userRepository.save(user);
-    } catch (error) {
+    } catch {
       throw new InternalServerErrorException('Error updating user');
     }
   }
@@ -116,8 +116,11 @@ async create(createUserDto: CreateUserDto): Promise<Partial<User>> {
   //   });
   //   return { token, role: user.role };
   // }
-  
-    async login(email: string, password: string): Promise<{ token: string; role: string }> {
+
+  async login(
+    email: string,
+    password: string,
+  ): Promise<{ token: string; role: string }> {
     // Find the user and select password explicitly
     const user = await this.userRepository.findOne({
       where: { email },

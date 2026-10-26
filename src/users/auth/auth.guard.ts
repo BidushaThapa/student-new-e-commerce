@@ -16,8 +16,10 @@ interface JwtPayload {
 }
 @Injectable()
 export class AuthGuard implements CanActivate {
-  constructor(private readonly usersService: UsersService,
-    private readonly jwtService: JwtService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly jwtService: JwtService,
+  ) {}
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<Request>();
 
@@ -35,14 +37,14 @@ export class AuthGuard implements CanActivate {
       throw new UnauthorizedException('Invalid token');
     }
     //TODO:Similar to AuthMiddleware from express ,get user info from database and attach to request
-    //as of now we are just attaching the payload 
-    const user=await this.usersService.findOne(payload.sub);
+    //as of now we are just attaching the payload
+    const user = await this.usersService.findOne(payload.sub);
     request['user'] = user;
     return true;
   }
   private extractTokenFromHeader(request: Request): string | undefined {
     const [type, token] = request.headers.authorization?.split(' ') ?? [];
-    console.log(type, token)
+    console.log(type, token);
     return type == 'Bearer' ? token : undefined;
   }
 }

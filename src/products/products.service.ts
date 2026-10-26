@@ -1,4 +1,8 @@
-import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from './entities/product.entity';
 import { Repository } from 'typeorm';
@@ -10,50 +14,60 @@ export class ProductsService {
     @InjectRepository(Product)
     private productRepository: Repository<Product>,
   ) {}
-  getAllProducts():Promise<Product[]>{
-    try{
-return this.productRepository.find();
-    }catch(error){
-throw new InternalServerErrorException(error);
-    }
-  } 
-  getOneProduct(id:string):Promise<Product|null>{
-    try{
-      return this.productRepository.findOneBy({id});
-    }catch(error){
-      throw new InternalServerErrorException(error);
-    }
-  }
-  async deleteOneProduct(id:string):Promise<void>{
-    try{
-        await this.productRepository.delete(id)
-      }
-    catch(error){
-       throw new InternalServerErrorException(error);
-    }
-  
-  }
-  async addProduct(createProductDto: CreateProductDto):Promise<Product>{
+  getAllProducts(): Promise<Product[]> {
     try {
-      const product = this.productRepository.create(createProductDto);
-      return await this.productRepository.save(product);
+      return this.productRepository.find();
     } catch (error) {
       throw new InternalServerErrorException(error);
     }
   }
-  async updateProduct(id:string,updateProductDto:UpdateProductDto):Promise<Product>{
-    try{
-const existingProduct=await this.productRepository.findOneBy({id});
-if(!existingProduct){
-  throw new NotFoundException('Product not found');
-}
-const  updatedProduct =this.productRepository.merge(
-  existingProduct,
-  updateProductDto,
-);
-return this.productRepository.save(updatedProduct);
-    }catch(error){
+  getOneProduct(id: string): Promise<Product | null> {
+    try {
+      return this.productRepository.findOneBy({ id });
+    } catch (error) {
       throw new InternalServerErrorException(error);
     }
   }
+  async deleteOneProduct(id: string): Promise<void> {
+    try {
+      const result = await this.productRepository.delete(id);
+      if (result.affected === 0) {
+        throw new NotFoundException('Product not found');
+      }
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new InternalServerErrorException(error);
+    }
   }
+  async addProduct(createProductDto: CreateProductDto): Promise<Product> {
+    try {
+      const product = this.productRepository.create(createProductDto);
+      return await this.productRepository.save(product);
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new InternalServerErrorException(error);
+    }
+  }
+  async updateProduct(
+    id: string,
+    updateProductDto: UpdateProductDto,
+  ): Promise<Product> {
+    try {
+      const existingProduct = await this.productRepository.findOneBy({ id });
+      if (!existingProduct) {
+        throw new NotFoundException('Product not found');
+      }
+      const updatedProduct = this.productRepository.merge(
+        existingProduct,
+        updateProductDto,
+      );
+      return this.productRepository.save(updatedProduct);
+    } catch (error) {
+      throw new InternalServerErrorException(error);
+    }
+  }
+}
