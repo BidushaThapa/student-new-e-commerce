@@ -1,28 +1,50 @@
-Student E-Commerce Platform
+# ShopNest
 
-A full-stack e-commerce web application developed as a student project using React, NestJS, and PostgreSQL. The platform aims to provide a seamless online shopping experience for customers and an intuitive admin dashboard for managing products, categories, inventory, and orders.
+ShopNest is a student e-commerce platform built with NestJS, PostgreSQL,
+TypeORM, React, TypeScript, Vite, and Tailwind CSS.
 
-Features
-Customer Website: Browse products, explore categories, and manage a shopping cart.
-User Authentication: Secure registration and login.
-Product Management: Organize products, descriptions, prices, and images.
-Shopping Cart & Checkout: Manage cart items and place orders.
-Order Management: Track and manage customer orders.
-Admin Dashboard: Manage products, categories, users, and orders.
-Database Integration: Store and manage application data using PostgreSQL.
-Tech Stack
-Frontend: React
-Backend: NestJS, Node.js, TypeScript
-Database: PostgreSQL
-ORM: TypeORM
-API Documentation: Swagger
-Version Control: Git and GitHub
-Project Goals
+## Project layout
 
-The goal of this project is to build a complete, functional e-commerce application while gaining practical experience in full-stack development, REST APIs, database management, authentication, and admin dashboard development.
+- `src/`: NestJS API and database modules
+- `frontend/`: React customer storefront and `/admin` application routes
+- `src/migrations/`: TypeORM migrations; existing migrations are preserved
+- `.env.example`: required backend environment variables
 
-Project Status
+Docker files are intentionally unchanged.
 
-🚧 Under development.
+## Setup
 
-More features and improvements will be added as development progresses.
+1. Copy `.env.example` to `.env`.
+2. Replace every placeholder secret and database value.
+3. Install dependencies:
+
+   ```bash
+   npm install
+   ```
+
+4. Start the API:
+
+   ```bash
+   npm run start:dev
+   ```
+
+5. Start the React development server in another terminal:
+
+   ```bash
+   npm run frontend:dev
+   ```
+
+The Vite server runs on `http://localhost:5173` and proxies `/api` requests
+to the NestJS server on port `3000`.
+
+## Validation
+
+```bash
+npm run build
+npm run build:frontend
+npm run lint
+```
+
+The backend requires database, JWT, and Cloudinary values at startup. Secrets
+must remain in local `.env` files and must not be committed or exposed to the
+React application.
